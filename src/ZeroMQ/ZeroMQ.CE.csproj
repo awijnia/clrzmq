@@ -1,0 +1,186 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4C90283A-D3E2-432A-9853-1C0A8D9572F5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>clrzmq_ce</RootNamespace>
+    <AssemblyName>clrzmq-ce</AssemblyName>
+    <ProjectTypeGuids>{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <PlatformFamilyName>PocketPC</PlatformFamilyName>
+    <PlatformID>4118C335-430C-497f-BE48-11C3316B135E</PlatformID>
+    <OSVersion>5.1</OSVersion>
+    <DeployDirSuffix>clrzmq_ce</DeployDirSuffix>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <NativePlatformName>Windows Mobile 5.0 Pocket PC SDK</NativePlatformName>
+    <FormFactorID>
+    </FormFactorID>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;$(PlatformFamilyName)</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <FileAlignment>512</FileAlignment>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;$(PlatformFamilyName)</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <FileAlignment>512</FileAlignment>
+    <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ContextOption.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DuplexSocket.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ErrorCode.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Frame.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\ContextProxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\DisposableIntPtr.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\ErrorDetails.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\ErrorProxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\LibZmq.NET.CE.cs" />
+    <Compile Include="Interop\MonitorEventData.cs" />
+    <Compile Include="Interop\Platform.NET.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\PollerProxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\PollEvents.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\PollItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\Retry.cs" />
+    <Compile Include="Interop\SocketProxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interop\ZmqMsgT.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Poller.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProtocolType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ReceiveSocket.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ReceiveStatus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="RouterBehavior.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SendReceiveExtensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SendSocket.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SendStatus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SocketEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SocketFlags.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SocketOption.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SocketType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SubscribeExtSocket.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SubscribeSocket.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TcpKeepaliveBehaviour.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ZmqContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ZmqException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ZmqMessage.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ZmqSocket.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ZmqSocketException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ZmqVersion.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ZmqVersionException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}">
+        <HostingProcess disable="1" />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

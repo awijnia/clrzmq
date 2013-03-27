@@ -36,7 +36,11 @@
                 return KnownErrors[errorCode];
             }
 
+#if PocketPC
+            string message = Marshal.PtrToStringUni(LibZmq.zmq_strerror(errorCode));
+#else
             string message = Marshal.PtrToStringAnsi(LibZmq.zmq_strerror(errorCode));
+#endif
 
             var errorDetails = new ErrorDetails(errorCode, message);
             KnownErrors[errorCode] = errorDetails;

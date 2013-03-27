@@ -47,6 +47,7 @@
         {
         }
 
+#if !PocketPC
         /// <summary>
         /// Initializes a new instance of the <see cref="ZmqVersionException"/> class.
         /// </summary>
@@ -56,5 +57,6 @@
             : base(info, context)
         {
         }
+#endif
     }
 }

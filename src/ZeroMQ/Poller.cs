@@ -158,7 +158,11 @@
         {
             if (disposing)
             {
+#if PocketPC
+                Pulse.Close();
+#else
                 Pulse.Dispose();
+#endif
             }
         }
 

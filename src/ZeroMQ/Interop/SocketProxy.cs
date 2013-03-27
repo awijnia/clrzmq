@@ -80,9 +80,18 @@
             int bytesReceived;
 
             // Use zmq_buffer_recv method if appropriate -> results in fewer P/Invoke calls
+#if PocketPC
+            if (buffer.Length <= MaxBufferSize)
+#else
             if (buffer.Length <= MaxBufferSize && LibZmq.zmq_buffer_recv != null)
+#endif
             {
+
+#if PocketPC
+                bytesReceived = Retry.zmq_buffer_recv(SocketHandle, _buffer, MaxBufferSize, flags);
+#else
                 bytesReceived = Retry.IfInterrupted(LibZmq.zmq_buffer_recv.Invoke, SocketHandle, _buffer, MaxBufferSize, flags);
+#endif
                 int size = Math.Min(buffer.Length, bytesReceived);
 
                 if (size > 0)
@@ -98,7 +107,11 @@
                 return -1;
             }
 
+#if PocketPC
+            bytesReceived = Retry.zmq_msg_recv(_msg.Ptr, SocketHandle, flags);
+#else
             bytesReceived = Retry.IfInterrupted(LibZmq.zmq_msg_recv.Invoke, _msg.Ptr, SocketHandle, flags);
+#endif
 
             if (bytesReceived == 0 && LibZmq.MajorVersion < 3)
             {
@@ -128,7 +141,11 @@
                 return buffer;
             }
 
+#if PocketPC
+            int bytesReceived = Retry.zmq_msg_recv(_msg.Ptr, SocketHandle, flags);
+#else
             int bytesReceived = Retry.IfInterrupted(LibZmq.zmq_msg_recv.Invoke, _msg.Ptr, SocketHandle, flags);
+#endif
 
             if (bytesReceived >= 0)
             {
@@ -159,12 +176,20 @@
         public int Send(byte[] buffer, int size, int flags)
         {
             // Use zmq_buffer_send method if appropriate -> results in fewer P/Invoke calls
+#if PocketPC
+            if (buffer.Length <= MaxBufferSize)
+#else
             if (buffer.Length <= MaxBufferSize && LibZmq.zmq_buffer_send != null)
+#endif
             {
                 int sizeToSend = Math.Min(size, MaxBufferSize);
                 Marshal.Copy(buffer, 0, _buffer, sizeToSend);
 
+#if PocketPC
+                return Retry.zmq_buffer_send(SocketHandle, _buffer, sizeToSend, flags);
+#else
                 return Retry.IfInterrupted(LibZmq.zmq_buffer_send.Invoke, SocketHandle, _buffer, sizeToSend, flags);
+#endif
             }
 
             if (_msg.Init(size) == -1)
@@ -177,7 +202,11 @@
                 Marshal.Copy(buffer, 0, _msg.Data(), size);
             }
 
+#if PocketPC
+            int bytesSent = Retry.zmq_msg_send(_msg.Ptr, SocketHandle, flags);
+#else
             int bytesSent = Retry.IfInterrupted(LibZmq.zmq_msg_send.Invoke, _msg.Ptr, SocketHandle, flags);
+#endif
 
             if (bytesSent == 0 && LibZmq.MajorVersion < 3)
             {
@@ -297,7 +326,11 @@
 
                 int rc = RetryGetSocketOptionIfInterrupted(option, optionValue.Ptr, optionLength.Ptr);
 
+#if PocketPC
+                value = rc == 0 ? Marshal.PtrToStringUni(optionValue) : string.Empty;
+#else
                 value = rc == 0 ? Marshal.PtrToStringAnsi(optionValue) : string.Empty;
+#endif
 
                 return rc;
             }
@@ -398,7 +431,11 @@
 #if UNIX
           return Retry.IfInterrupted(LibZmq.zmq_getsockopt, SocketHandle, option, optionValue, optionLength);
 #else
+    #if PocketPC
+          return Retry.zmq_getsockopt(SocketHandle, option, optionValue, optionLength);
+    #else
           return Retry.IfInterrupted(LibZmq.zmq_getsockopt.Invoke, SocketHandle, option, optionValue, optionLength);
+    #endif
 #endif
         }
 
@@ -407,7 +444,11 @@
 #if UNIX
           return Retry.IfInterrupted(LibZmq.zmq_setsockopt, SocketHandle, option, optionValue, optionLength);
 #else
+    #if PocketPC
+          return Retry.zmq_setsockopt(SocketHandle, option, optionValue, optionLength);
+    #else
           return Retry.IfInterrupted(LibZmq.zmq_setsockopt.Invoke, SocketHandle, option, optionValue, optionLength);
+    #endif
 #endif
         }
     }

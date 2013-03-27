@@ -9,12 +9,21 @@
     /// </summary>
     public class ZmqVersion
     {
+#if PocketPC
+        private static readonly ZmqVersion CurrentVersion;
+
+        static ZmqVersion() {
+            var version = GetCurrentVersion();
+            CurrentVersion = new ZmqVersion(version.Major, version.Minor, version.Patch);
+        }
+#else
         private static readonly Lazy<ZmqVersion> CurrentVersion;
 
         static ZmqVersion()
         {
             CurrentVersion = new Lazy<ZmqVersion>(GetCurrentVersion);
         }
+#endif
 
         private ZmqVersion(int major, int minor, int patch)
         {
@@ -28,7 +37,11 @@
         /// </summary>
         public static ZmqVersion Current
         {
+#if PocketPC
+            get { return CurrentVersion; }
+#else
             get { return CurrentVersion.Value; }
+#endif
         }
 
         /// <summary>

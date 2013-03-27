@@ -17,8 +17,14 @@
             }
 
             this.Socket = socket;
+
+#if PocketPC
+            this.ReceiveReady = (readyEvents & PollEvents.PollIn) != 0;
+            this.SendReady = (readyEvents & PollEvents.PollOut) != 0;
+#else
             this.ReceiveReady = readyEvents.HasFlag(PollEvents.PollIn);
             this.SendReady = readyEvents.HasFlag(PollEvents.PollOut);
+#endif
         }
 
         /// <summary>

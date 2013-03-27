@@ -51,6 +51,7 @@
         {
         }
 
+#if !PocketPC
         /// <summary>
         /// Initializes a new instance of the <see cref="ZmqException"/> class.
         /// </summary>
@@ -60,6 +61,7 @@
             : base(info, context)
         {
         }
+#endif
 
         /// <summary>
         /// Gets the error code returned by the ZeroMQ library call.

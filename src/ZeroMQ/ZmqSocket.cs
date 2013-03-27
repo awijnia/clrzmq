@@ -1,7 +1,9 @@
 ﻿namespace ZeroMQ
 {
-    using System;
     using Interop;
+    using System;
+    using System.Threading;
+    using System.Diagnostics;
 
     /// <summary>
     /// Sends and receives messages across various transports to potentially multiple endpoints
@@ -134,7 +136,11 @@
         /// <exception cref="ObjectDisposedException">The <see cref="ZmqSocket"/> has been closed.</exception>
         public int MulticastRate
         {
+#if PocketPC
+            get { return GetSocketOptionInt32(SocketOption.RATE); }
+#else
             get { return GetLegacySocketOption(SocketOption.RATE, GetSocketOptionInt64); }
+#endif
             set { SetLegacySocketOption(SocketOption.RATE, value, (long)value, SetSocketOption); }
         }
 
@@ -145,7 +151,11 @@
         /// <exception cref="ObjectDisposedException">The <see cref="ZmqSocket"/> has been closed.</exception>
         public TimeSpan MulticastRecoveryInterval
         {
+#if PocketPC
+            get { return TimeSpan.FromMilliseconds(GetSocketOptionInt32(SocketOption.RECONNECT_IVL)); }
+#else
             get { return TimeSpan.FromMilliseconds(GetLegacySocketOption(SocketOption.RECOVERY_IVL, GetSocketOptionInt64)); }
+#endif
             set { SetLegacySocketOption(SocketOption.RECOVERY_IVL, (int)value.TotalMilliseconds, (long)value.TotalMilliseconds, SetSocketOption); }
         }
 
@@ -156,7 +166,11 @@
         /// <exception cref="ObjectDisposedException">The <see cref="ZmqSocket"/> has been closed.</exception>
         public int ReceiveBufferSize
         {
+#if PocketPC
+            get { return GetSocketOptionInt32(SocketOption.RCVBUF); }
+#else
             get { return GetLegacySocketOption(SocketOption.RCVBUF, GetSocketOptionUInt64); }
+#endif
             set { SetLegacySocketOption(SocketOption.RCVBUF, value, (ulong)value, SetSocketOption); }
         }
 
@@ -168,7 +182,11 @@
         /// <remarks>If using 0MQ 2.x, will use the (deprecated) HWM socket option instead.</remarks>
         public int ReceiveHighWatermark
         {
+#if PocketPC
+            get { return GetSocketOptionInt32(ReceiveHwmOpt); }
+#else
             get { return GetLegacySocketOption(ReceiveHwmOpt, GetSocketOptionUInt64); }
+#endif
             set { SetLegacySocketOption(ReceiveHwmOpt, value, (ulong)value, SetSocketOption); }
         }
 
@@ -179,7 +197,11 @@
         /// <exception cref="ObjectDisposedException">The <see cref="ZmqSocket"/> has been closed.</exception>
         public bool ReceiveMore
         {
+#if PocketPC
+            get { return GetSocketOptionInt32(SocketOption.RCVMORE) == 1; }
+#else
             get { return GetLegacySocketOption(SocketOption.RCVMORE, GetSocketOptionInt64) == 1; }
+#endif
         }
 
         /// <summary>
@@ -223,7 +245,11 @@
         /// <exception cref="ObjectDisposedException">The <see cref="ZmqSocket"/> has been closed.</exception>
         public int SendBufferSize
         {
+#if PocketPC
+            get { return GetSocketOptionInt32(SocketOption.SNDBUF); }
+#else
             get { return GetLegacySocketOption(SocketOption.SNDBUF, GetSocketOptionUInt64); }
+#endif
             set { SetLegacySocketOption(SocketOption.SNDBUF, value, (ulong)value, SetSocketOption); }
         }
 
@@ -235,7 +261,11 @@
         /// <remarks>If using 0MQ 2.x, will use the (deprecated) HWM socket option instead.</remarks>
         public int SendHighWatermark
         {
+#if PocketPC
+            get { return GetSocketOptionInt32(SendHwmOpt); }
+#else
             get { return GetLegacySocketOption(SendHwmOpt, GetSocketOptionUInt64); }
+#endif
             set { SetLegacySocketOption(SendHwmOpt, value, (ulong)value, SetSocketOption); }
         }
 
@@ -548,9 +578,36 @@
         /// <exception cref="NotSupportedException">The current socket type does not support Receive operations.</exception>
         public int Receive(byte[] buffer, TimeSpan timeout)
         {
+#if PocketPC
+            if (timeout == TimeSpan.MaxValue) {
+                return Receive(buffer);
+            } else {
+                if ((int)timeout.TotalMilliseconds < 1) {
+                    return Receive(buffer, timeout);
+                }
+
+                Int32 receiveResult;
+
+                var timer = Stopwatch.StartNew();
+
+                do {
+                    receiveResult = Receive(buffer, timeout);
+
+                    if (ReceiveStatus != ReceiveStatus.TryAgain) {
+                        break;
+                    }
+
+                    Thread.Sleep(0);
+                }
+                while (timer.Elapsed <= timeout);
+
+                return receiveResult;
+            }
+#else
             return timeout == TimeSpan.MaxValue
                        ? Receive(buffer)
                        : this.WithTimeout(Receive, buffer, SocketFlags.DontWait, timeout);
+#endif
         }
 
         /// <summary>
@@ -648,7 +705,29 @@
             }
 
             int receivedBytes;
+#if PocketPC
+            if ((int)timeout.TotalMilliseconds < 1) {
+                var msg = Receive(buffer, SocketFlags.DontWait, out receivedBytes);
+                size = receivedBytes;
+                return msg;
+            }
+
+            Byte[] message;
+
+            var timer = Stopwatch.StartNew();
+
+            do {
+                message = Receive(buffer, SocketFlags.DontWait, out receivedBytes);
+
+                if (ReceiveStatus != ReceiveStatus.TryAgain) {
+                    break;
+                }
+                Thread.Sleep(0);
+            }
+            while (timer.Elapsed <= timeout);
+#else
             byte[] message = this.WithTimeout(Receive, buffer, SocketFlags.DontWait, out receivedBytes, timeout);
+#endif
 
             size = receivedBytes;
 
@@ -780,9 +859,36 @@
         /// <exception cref="NotSupportedException">The current socket type does not support Send operations.</exception>
         public int Send(byte[] buffer, int size, SocketFlags flags, TimeSpan timeout)
         {
+#if PocketPC
+            if (timeout == TimeSpan.MaxValue) {
+                return Send(buffer, size, flags & ~SocketFlags.DontWait);
+            } else {
+                if ((int)timeout.TotalMilliseconds < 1) {
+                    return Send(buffer, size, flags | SocketFlags.DontWait, timeout);
+                }
+
+                Int32 resp;
+
+                var timer = Stopwatch.StartNew();
+
+                do {
+                    resp = Send(buffer, size, flags | SocketFlags.DontWait, timeout);
+
+                    if (ReceiveStatus != ReceiveStatus.TryAgain) {
+                        break;
+                    }
+
+                    Thread.Sleep(0);
+                }
+                while (timer.Elapsed <= timeout);
+
+                return resp;
+            }
+#else
             return timeout == TimeSpan.MaxValue
                     ? Send(buffer, size, flags & ~SocketFlags.DontWait)
                     : this.WithTimeout(Send, buffer, size, flags | SocketFlags.DontWait, timeout);
+#endif
         }
 
         /// <summary>
@@ -1016,6 +1122,17 @@
 
         internal void InvokePollEvents(PollEvents readyEvents)
         {
+#if PocketPC
+            if ((readyEvents & PollEvents.PollIn) != 0)
+            {
+                InvokeReceiveReady(readyEvents);
+            }
+
+            if ((readyEvents & PollEvents.PollOut) != 0)
+            {
+                InvokeSendReady(readyEvents);
+            }
+#else
             if (readyEvents.HasFlag(PollEvents.PollIn))
             {
                 InvokeReceiveReady(readyEvents);
@@ -1025,6 +1142,7 @@
             {
                 InvokeSendReady(readyEvents);
             }
+#endif
         }
 
         internal PollEvents GetPollEvents()
