@@ -239,9 +239,19 @@
             {
                 foreach (PollItem pollItem in _pollItems.Where(item => item.ReadyEvents != (short)PollEvents.None))
                 {
+#if PocketPC
+                    foreach (var pollableSocket in _pollableSockets) {
+                        if (pollableSocket.Value.SocketHandle == pollItem.Socket) {
+                            ZmqSocket socket = pollableSocket.Value;
+
+                            socket.InvokePollEvents((PollEvents)pollItem.ReadyEvents);
+                        }
+                    }
+#else
                     ZmqSocket socket = _pollableSockets[pollItem];
 
                     socket.InvokePollEvents((PollEvents)pollItem.ReadyEvents);
+#endif
                 }
             }
 
