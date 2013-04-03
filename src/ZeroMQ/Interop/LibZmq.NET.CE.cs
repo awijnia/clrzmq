@@ -103,7 +103,10 @@ namespace ZeroMQ.Interop
         public static extern Int32 zmq_close(IntPtr socket);
 
         [DllImport("libzmq")]
-        public static extern Int32 zmq_buffer_recv(IntPtr socket, IntPtr buf, int size, int flags);
+        public static extern Int32 zmq_recv(IntPtr socket, IntPtr buf, int size, int flags);
+        public static Int32 zmq_buffer_recv(IntPtr socket, IntPtr buf, int size, int flags) {
+            return zmq_recv(socket, buf, size, flags);
+        }
 
         [DllImport("libzmq")]
         public static extern Int32 zmq_errno();
@@ -112,7 +115,10 @@ namespace ZeroMQ.Interop
         unsafe public static extern Int32 zmq_msg_recv(IntPtr msg, IntPtr socket, int flags);
 
         [DllImport("libzmq", CharSet = CharSet.Unicode)]
-        unsafe public static extern Int32 zmq_buffer_send(IntPtr socket, IntPtr buf, int size, int flags);
+        unsafe public static extern Int32 zmq_send(IntPtr socket, IntPtr buf, int size, int flags);
+        unsafe public static Int32 zmq_buffer_send(IntPtr socket, IntPtr buf, int size, int flags) {
+            return zmq_send(socket, buf, size, flags);
+        }
 
         [DllImport("libzmq", CharSet = CharSet.Unicode)]
         unsafe public static extern Int32 zmq_msg_send(IntPtr msg, IntPtr socket, int flags);
